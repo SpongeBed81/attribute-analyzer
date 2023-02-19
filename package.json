@@ -1,6 +1,6 @@
 {
   "name": "attribute-analyzer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Parse your complex element attributes with ease",
   "main": "index.js",
   "type": "module",

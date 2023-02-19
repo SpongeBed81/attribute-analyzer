@@ -9,24 +9,23 @@
 ```js
 import { EmptyAttribute,getAttributes,getLocalName } from "attribute-analyzer"
 
-const input = `<button on:click={hello} on:test={() => (function(){color = 'blue' })()} selected marked class="styling" used></button>`;
+const input = `<a style="background-color: {red}" :data={"sa" + hello} test="yes" selected on:click='{() => alert("{}")}'></a>`;
 
 //Getting the local name
-const name = getLocalName(input); // => button
+const name = getLocalName(input); // => a
 
 //Getting all of the attributes
 const attributes = getAttributes(input); /* =>  
 {
-  'on:click': 'hello',
-  'on:test': "() => (function(){color = 'blue' })()",
+  style: '"background-color: {red}"',
+  ':data': '{"sa" + hello}',
+  test: '"yes"',
   selected: EmptyAttribute {},
-  marked: EmptyAttribute {},
-  class: 'styling',
-  used: EmptyAttribute {}
+  'on:click': `'{() => alert("{}")}'`
 }*/
 
 //Validating an attribute
-const isEmpty = attributes.used instanceof EmptyAttribute // => true
+const isEmpty = attributes.selected instanceof EmptyAttribute // => true
 ```
 
 ## Installation
