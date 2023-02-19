@@ -1,19 +1,33 @@
 export class EmptyAttribute {}
 
 export function getAttributes(element) {
-const localName = getLocalName(element);
-element = element.replace("<"+localName, '');
-if(element.endsWith(`</${localName}>`)) element = element.slice(0, -(`</${localName}>`.length));
-if(element.endsWith(`/>`)) element = element.slice(0, -(`/>`.length));
-if(element.endsWith(`>`)) element = element.slice(0, -(`>`.length));
-const attributes = parseAttributes(element);
-return correctify(attributes);
+  element = element.trim()
+  const localName = getLocalName(element)
+
+  //determine it is a self closing tag
+  if (element.endsWith(`/>`) && element.startsWith(`<${localName}`)) {
+
+    const lastIndexOf = element.lastIndexOf(`/>`)
+    element = element.slice(localName.length + 1, lastIndexOf).trim()
+
+  } else if (element.endsWith(`</${localName}>`) && element.startsWith(`<${localName}`)) {
+
+    element = element.slice(localName.length + 1, -localName.length - 3).trim()
+    const lastIndexOf = element.lastIndexOf(`>`)
+    element = element.slice(0, lastIndexOf).trim()
+
+  } else {
+    throw new Error("Parsing Error: Element does not have a closing tag")
+  }
+
+  const attributes = parseAttributes(element);
+  return correctify(attributes);
 }
 
 function correctify(attributes) {
   let newobj = {};
   Object.keys(attributes).forEach(key => {
-    if(key == "") {
+    if (key == "") {
       newobj[attributes[key]] = new EmptyAttribute();
     } else {
       newobj[key] = attributes[key];
@@ -62,10 +76,10 @@ function parseAttributes(input) {
 
 
 export function getLocalName(input) {
- const openingTagEndIndex = input.indexOf('>');
- const tagStringWithoutClosingSlash = input.slice(0, openingTagEndIndex).trimEnd();
- 
- const tagName = tagStringWithoutClosingSlash.split(' ')[0].replace("<", '');
- 
- return tagName;
+  const openingTagEndIndex = input.indexOf('>');
+  const tagStringWithoutClosingSlash = input.slice(0, openingTagEndIndex).trimEnd();
+
+  const tagName = tagStringWithoutClosingSlash.split(' ')[0].replace("<", '');
+
+  return tagName;
 }

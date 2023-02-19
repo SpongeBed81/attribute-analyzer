@@ -9,7 +9,7 @@
 ```js
 import { EmptyAttribute,getAttributes,getLocalName } from "attribute-analyzer"
 
-const input = `<a style="background-color: {red}" :data={"sa" + hello} test="yes" selected on:click='{() => alert("{}")}'></a>`;
+const input = `<a style="background-color: {red}" :data={"sa" + hello} test="yes" selected on:click='{() => alert("{}")}'>hello</a>`;
 
 //Getting the local name
 const name = getLocalName(input); // => a
