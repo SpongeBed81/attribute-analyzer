@@ -7,51 +7,59 @@ if(element.endsWith(`</${localName}>`)) element = element.slice(0, -(`</${localN
 if(element.endsWith(`/>`)) element = element.slice(0, -(`/>`.length));
 if(element.endsWith(`>`)) element = element.slice(0, -(`>`.length));
 const attributes = parseAttributes(element);
-return toObject(attributes);
+return correctify(attributes);
 }
 
-function toObject(attributes) {
- const output = {};
- attributes.forEach(attribute => {
-   if(!attribute.includes("=")) {
-     output[attribute] = new EmptyAttribute();
-     return;
-   } else {
-     const getEqualIndex = attribute.indexOf("=");
-     const key = attribute.slice(0, getEqualIndex);
-     let value = attribute.slice(getEqualIndex+1);
-     if(value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
-     if(value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
-     if(value.startsWith("{") && value.endsWith("}")) value = value.slice(1, -1);
-     output[key] = value;
-   }
- });
- return output;
+function correctify(attributes) {
+  let newobj = {};
+  Object.keys(attributes).forEach(key => {
+    if(key == "") {
+      newobj[attributes[key]] = new EmptyAttribute();
+    } else {
+      newobj[key] = attributes[key];
+    }
+  })
+  return newobj;
 }
-
 
 function parseAttributes(input) {
- const output = [];
- let start = 0;
- let insideCurlyBraces = false;
- for (let i = 0; i < input.length; i++) {
-   const char = input.charAt(i);
-   if (char === '{') {
-     insideCurlyBraces = true;
-   } else if (char === '}') {
-     insideCurlyBraces = false;
-   } else if (char === ' ' && !insideCurlyBraces && i > 0 && input.charAt(i - 1) !== ' ') {
-     const attribute = input.substring(start, i).trim();
-     output.push(attribute);
-     start = i + 1;
-   }
- }
- const lastAttribute = input.substring(start).trim();
- if (lastAttribute.length > 0) {
-   output.push(lastAttribute);
- }
- return output;
+  const output = {};
+  let insideCurlyBraces = false;
+  let insideQuotes = false;
+  let attributeName = '';
+  let attributeValue = '';
+  let currentValue = '';
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charAt(i);
+    if (char === '{' && !insideQuotes) {
+      insideCurlyBraces = true;
+      currentValue += char;
+    } else if (char === '}' && !insideQuotes) {
+      insideCurlyBraces = false;
+      currentValue += char;
+    } else if (char === '"' && !insideCurlyBraces) {
+      insideQuotes = !insideQuotes;
+      currentValue += char;
+    } else if (char === '=' && !insideCurlyBraces && !insideQuotes) {
+      attributeName = currentValue.trim();
+      currentValue = '';
+    } else if (char === ' ' && !insideCurlyBraces && !insideQuotes) {
+      if (currentValue.trim().length > 0) {
+        attributeValue = currentValue.trim();
+        output[attributeName] = attributeValue;
+        currentValue = '';
+        attributeName = '';
+      }
+    } else {
+      currentValue += char;
+    }
+  }
+  if (currentValue.trim().length > 0) {
+    output[attributeName] = currentValue.trim();
+  }
+  return output;
 }
+
 
 export function getLocalName(input) {
  const openingTagEndIndex = input.indexOf('>');
