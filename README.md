@@ -7,25 +7,48 @@
 
 
 ```js
-import { EmptyAttribute,getAttributes,getLocalName } from "attribute-analyzer"
+import { EmptyAttribute,analyze,getLocalName } from "attribute-analyzer"
 
-const input = `<a style="background-color: {red}" :data={"sa" + hello} test="yes" selected on:click='{() => alert("{}")}'>hello</a>`;
+const input = `<button on:click={() => {value++}} test="yes" :data>testing</button>`;
 
 //Getting the local name
-const name = getLocalName(input); // => a
+const name = getLocalName(input); // => button
 
-//Getting all of the attributes
-const attributes = getAttributes(input); /* =>  
+//Analyzing the element
+const analyzedElement = analyze(input); /* => 
 {
-  style: '"background-color: {red}"',
-  ':data': '{"sa" + hello}',
-  test: '"yes"',
-  selected: EmptyAttribute {},
-  'on:click': `'{() => alert("{}")}'`
-}*/
+  element: {
+    attributeOffsets: { 'on:click': [Object], test: [Object], ':data': [Object] },
+    attributes: {
+      ':data': EmptyAttribute {},
+      'on:click': '{() => {value++}}',
+      test: '"yes"'
+    },
+    rawElement: '<button on:click={() => {value++}} test="yes" :data>testing</button>',
+    rawAttributes: 'on:click={() => {value++}} test="yes" :data',
+    localName: 'button',
+    innerHTML: { content: 'testing', startOffset: 52, endOffset: 59 },
+    selfClosing: false
+  },
+  addAttribute: [Function: bound addAttribute],
+  removeAttribute: [Function: bound removeAttribute]
+}
+*/
 
 //Validating an attribute
-const isEmpty = attributes.selected instanceof EmptyAttribute // => true
+const isEmpty = analyzedElement.element.attributes[":data"] instanceof EmptyAttribute // => true
+
+//Adding an attribute to the element
+attributes.addAttribute({"name": "on:mouseover", "value": `{() => alert("hey")}`})
+console.log(attributes.element.rawElement) /* => 
+<button on:click={() => {value++}} test="yes" :data on:mouseover={() => alert("hey")}>testing</button>
+*/
+
+//Removing an attribute from the element
+attributes.removeAttribute("on:mouseover")
+console.log(attributes.element.rawElement) /* => 
+<button on:click={() => {value++}} test="yes" :data >testing</button>
+*/
 ```
 
 ## Installation

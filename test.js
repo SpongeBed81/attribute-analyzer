@@ -1,5 +1,7 @@
-import {EmptyAttribute, getAttributes, getLocalName } from "./index.js";
-const input = `<a style="background-color: {red};" :data={"sa" + hello} test="yes" selected on:click='{() => alert("{}")}'/>`;
-const attributes = getAttributes(input);
-console.log(getLocalName(input))
-console.log(attributes)
+import {EmptyAttribute, analyze, getLocalName } from "./index.js";
+const input = `<button on:click={() => {value++}} test="yes" :data>testing</button>`;
+let attributes = analyze(input)
+attributes.addAttribute({"name": "on:mouseover", "value": `{() => alert("hey")}`})
+console.log(attributes.element.rawElement)
+attributes.removeAttribute("on:mouseover")
+console.log(attributes.element.rawElement)

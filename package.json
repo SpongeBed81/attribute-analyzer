@@ -1,6 +1,6 @@
 {
   "name": "attribute-analyzer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Parse your complex element attributes with ease",
   "main": "index.js",
   "type": "module",
@@ -9,5 +9,12 @@
   },
   "author": "SpongeBed",
   "license": "MIT",
-  "keywords": ["cheerio", "parse5", "jsdom", "attribute", "compiler", "svelte"]
+  "keywords": [
+    "cheerio",
+    "parse5",
+    "jsdom",
+    "attribute",
+    "compiler",
+    "svelte"
+  ]
 }
